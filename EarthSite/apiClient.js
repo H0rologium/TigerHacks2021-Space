@@ -1,15 +1,17 @@
+import { parseTLEFromAPI } from './fancy-earth.js';
 const ids = ['49181', '49180', '49179', '49178', '49177', '49176', '49175', '49174', '49173', '49172', '49171', '49170', '49169', '49168', '49167', '49166', '49165', '49164', '49163', '49162', '49161', '49160', '49159', '49158', '49157', '49156', '49155', '49154', '49153', '49152', '49151', '49150', '49149', '49148', '49147', '49146', '49145', '49144', '49143', '49142', '49141', '49140', '49139', '49138', '49137', '49136', '49135', '49134', '49133', '49132', '49131', '49130', '49129', '49128', '49127', '49126', '49125', '49124', '49123', '49122', '49121', '49120', '49119', '49118', '49117', '49116', '49115', '49114', '49113', '49112', '49111', '49110', '49109', '49108', '49107', '49106', '49105', '49104', '49103', '49102', '49101', '49100'];
 const results = [];
 for (let x in ids)
 {
     var satellite = $.ajax({
-        url: 'https://tle.ivanstanojevic.me/api/tle/' + ids[x],
+        url: 'https://tle.ivanstanojevic.me/api/tle/',
         method: 'GET',
         success : function (response) { 
             //TLE line 1, TLE line 2, id of satellite, name of satellite
-            results.push([response.line1, response.line2, ids[x], response.name]);        
+            //results.push([response.line1, response.line2, ids[x], response.name]); 
+            console.log(response);       
         }
     });
 }
 //Call method here, pass results.
-console.log(results);
+//parseTLEFromAPI(results);

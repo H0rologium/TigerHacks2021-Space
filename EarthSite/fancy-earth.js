@@ -235,11 +235,12 @@ scene.add(earth);
 var parsedTles;
 var satellites;
 //Parameter is a double array with tle1,tle2,id and name
-parseTLE(parsedData){
+export function parseTLEFromAPI(parsedData){
   var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
   var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
   var satGeometry = new THREE.Geometry();
   var date = new Date(activeClock.date());
+  console.log(parsedData);
   var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
   satGeometry.vertices = satrecs.map(function (satrec) {
     return satelliteVector(satrec, date);
