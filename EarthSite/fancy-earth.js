@@ -247,8 +247,6 @@ export function parseTLEFromAPI(parsedData){
   satGeometry.vertices = satrecs.map(function (satrec) {
     return satelliteVector(satrec, date);
   });
-  console.log('satgeometry');
-  console.log(satGeometry);
   satellites = new THREE.Points(
     satGeometry,
     new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
