@@ -140,9 +140,6 @@ export function parseTle(tleString) {
 
 
  export function satelliteVector(satrec, date) {
-    console.log('satrec and date below');
-    console.log(satrec);
-    console.log(date);
     var xyz = satrecToXYZ(satrec, date);
     var lambda = xyz[0];
     var phi = xyz[1];
