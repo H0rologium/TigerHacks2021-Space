@@ -1,12 +1,16 @@
 import { clock, tle, parseTle, satelliteVector } from "./js/helper.js";
 // Scene, Camera, Renderer
+
+var width = window.innerWidth,
+  height = window.innerHeight,
+  radius = 228;
 let renderer = new THREE.WebGLRenderer();
 let scene = new THREE.Scene();
 let aspect = window.innerWidth / window.innerHeight;
 let camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1500);
 let cameraRotation = 0;
 let cameraRotationSpeed = 0.001;
-let cameraAutoRotation = true;
+let cameraAutoRotation = false;
 let orbitControls = new THREE.OrbitControls(camera);
 
 // Lights
@@ -18,7 +22,7 @@ let textureLoader = new THREE.TextureLoader();
 // Planet Proto
 let planetProto = {
   sphere: function (size) {
-    let sphere = new THREE.SphereGeometry(size, 32, 32);
+    let sphere = new THREE.SphereGeometry(size, 128, 128);
 
     return sphere;
   },
@@ -95,70 +99,70 @@ let createPlanet = function (options) {
   let surfaceMaterial = planetProto.material(options.surface.material);
   let surface = new THREE.Mesh(surfaceGeometry, surfaceMaterial);
 
-  // Create the planet's Atmosphere
-  let atmosphereGeometry = planetProto.sphere(
-    options.surface.size + options.atmosphere.size
-  );
-  let atmosphereMaterialDefaults = {
-    side: THREE.DoubleSide,
-    transparent: true,
-  };
-  let atmosphereMaterialOptions = Object.assign(
-    atmosphereMaterialDefaults,
-    options.atmosphere.material
-  );
-  let atmosphereMaterial = planetProto.material(atmosphereMaterialOptions);
-  let atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+  // // Create the planet's Atmosphere
+  // let atmosphereGeometry = planetProto.sphere(
+  //   options.surface.size + options.atmosphere.size
+  // );
+  // let atmosphereMaterialDefaults = {
+  //   side: THREE.DoubleSide,
+  //   transparent: true,
+  // };
+  // let atmosphereMaterialOptions = Object.assign(
+  //   atmosphereMaterialDefaults,
+  //   options.atmosphere.material
+  // );
+  // let atmosphereMaterial = planetProto.material(atmosphereMaterialOptions);
+  // let atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
 
-  // Create the planet's Atmospheric glow
-  let atmosphericGlowGeometry = planetProto.sphere(
-    options.surface.size +
-      options.atmosphere.size +
-      options.atmosphere.glow.size
-  );
-  let atmosphericGlowMaterial = planetProto.glowMaterial(
-    options.atmosphere.glow.intensity,
-    options.atmosphere.glow.fade,
-    options.atmosphere.glow.color
-  );
-  let atmosphericGlow = new THREE.Mesh(
-    atmosphericGlowGeometry,
-    atmosphericGlowMaterial
-  );
+  // // Create the planet's Atmospheric glow
+  // let atmosphericGlowGeometry = planetProto.sphere(
+  //   options.surface.size +
+  //     options.atmosphere.size +
+  //     options.atmosphere.glow.size
+  // );
+  // let atmosphericGlowMaterial = planetProto.glowMaterial(
+  //   options.atmosphere.glow.intensity,
+  //   options.atmosphere.glow.fade,
+  //   options.atmosphere.glow.color
+  // );
+  // let atmosphericGlow = new THREE.Mesh(
+  //   atmosphericGlowGeometry,
+  //   atmosphericGlowMaterial
+  // );
 
   // Nest the planet's Surface and Atmosphere into a planet object
   let planet = new THREE.Object3D();
   surface.name = "surface";
-  atmosphere.name = "atmosphere";
-  atmosphericGlow.name = "atmosphericGlow";
+  // atmosphere.name = "atmosphere";
+  // atmosphericGlow.name = "atmosphericGlow";
   planet.add(surface);
-  planet.add(atmosphere);
-  planet.add(atmosphericGlow);
+  // planet.add(atmosphere);
+  // planet.add(atmosphericGlow);
 
-  // Load the Surface's textures
-  for (let textureProperty in options.surface.textures) {
-    planetProto.texture(
-      surfaceMaterial,
-      textureProperty,
-      options.surface.textures[textureProperty]
-    );
-  }
+  // // Load the Surface's textures
+  // for (let textureProperty in options.surface.textures) {
+  //   planetProto.texture(
+  //     surfaceMaterial,
+  //     textureProperty,
+  //     options.surface.textures[textureProperty]
+  //   );
+  // }
 
-  // Load the Atmosphere's texture
-  for (let textureProperty in options.atmosphere.textures) {
-    planetProto.texture(
-      atmosphereMaterial,
-      textureProperty,
-      options.atmosphere.textures[textureProperty]
-    );
-  }
+  // // Load the Atmosphere's texture
+  // for (let textureProperty in options.atmosphere.textures) {
+  //   planetProto.texture(
+  //     atmosphereMaterial,
+  //     textureProperty,
+  //     options.atmosphere.textures[textureProperty]
+  //   );
+  // }
 
   return planet;
 };
 
 let earth = createPlanet({
   surface: {
-    size: 0.5,
+    size: radius - 0.5,
     material: {
       bumpScale: 0.05,
       specular: new THREE.Color("grey"),
@@ -277,15 +281,16 @@ textureLoader.load(
   "https://s3-us-west-2.amazonaws.com/s.cdpn.io/141228/starfield.png",
   function (texture) {
     galaxyMaterial.map = texture;
-   scene.add(galaxy);
+    // scene.add(galaxy);
   }
 );
 
 // Scene, Camera, Renderer Configuration
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(width, height);
 document.body.appendChild(renderer.domElement);
 
-camera.position.set(1, 1, 1);
+camera.position.set(-200, 500, 1000);
 orbitControls.enabled = !cameraAutoRotation;
 
 scene.add(camera);
@@ -312,7 +317,7 @@ Promise.all([d3.text("tles.txt")]).then(function (results) {
   scene.add(satellites);
 });
 // Light Configurations
-spotLight.position.set(2, 0, 1);
+spotLight.position.set(2, 0, 100000);
 
 // Mesh Configurations
 earth.receiveShadow = true;
@@ -329,14 +334,14 @@ window.addEventListener("resize", function () {
 // Main render function
 let render = function () {
   earth.getObjectByName("surface").rotation.y += (1 / 32) * 0.01;
-  earth.getObjectByName("atmosphere").rotation.y += (1 / 16) * 0.01;
-  if (cameraAutoRotation) {
-    cameraRotation += cameraRotationSpeed;
-    camera.position.y = 0;
-    camera.position.x = 2 * Math.sin(cameraRotation);
-    camera.position.z = 2 * Math.cos(cameraRotation);
-    camera.lookAt(earth.position);
-  }
+  // earth.getObjectByName("atmosphere").rotation.y += (1 / 16) * 0.01;
+  // if (cameraAutoRotation) {
+  //   cameraRotation += cameraRotationSpeed;
+  //   camera.position.y = 0;
+  //   camera.position.x = 2 * Math.sin(cameraRotation);
+  //   camera.position.z = 2 * Math.cos(cameraRotation);
+  //   camera.lookAt(earth.position);
+  // }
   requestAnimationFrame(render);
   renderer.render(scene, camera);
 };
