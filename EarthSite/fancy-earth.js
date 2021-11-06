@@ -234,13 +234,13 @@ scene.add(earth);
 
 var parsedTles;
 var satellites;
-Promise.all([d3.text("tles.txt")]).then(function (results) {
-  parsedTles = parseTle(results[0]);
+//Parameter is a double array with tle1,tle2,id and name
+parseTLE(parsedData){
   var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
   var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
   var satGeometry = new THREE.Geometry();
   var date = new Date(activeClock.date());
-  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedTles);
+  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
   satGeometry.vertices = satrecs.map(function (satrec) {
     return satelliteVector(satrec, date);
   });
@@ -249,7 +249,7 @@ Promise.all([d3.text("tles.txt")]).then(function (results) {
     new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
   );
   scene.add(satellites);
-});
+}
 // Light Configurations
 spotLight.position.set(600, 400, 1000);
 
