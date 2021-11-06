@@ -240,11 +240,15 @@ export function parseTLEFromAPI(parsedData){
   var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
   var satGeometry = new THREE.Geometry();
   var date = new Date(activeClock.date());
-  console.log(parsedData);
   var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
+  //Skip satellites with no position or veloctiy
+  satrecs = satrecs.filter(satrecs => satellite.propagate(satrecs, date)[0] != false);
+  //-------
   satGeometry.vertices = satrecs.map(function (satrec) {
     return satelliteVector(satrec, date);
   });
+  console.log('satgeometry');
+  console.log(satGeometry);
   satellites = new THREE.Points(
     satGeometry,
     new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })

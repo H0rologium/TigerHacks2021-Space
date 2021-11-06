@@ -91,10 +91,11 @@ var satellite = $.ajax({
   success: function (response) {
     //TLE line 1, TLE line 2, id of satellite, name of satellite
     //results.push([response.line1, response.line2, ids[x], response.name]);
-    console.log(response);
-    return response.members.map((sat) => {});
-  },
+    const f = response.member.map(sat => [sat.line1, sat.line2]);
+    //Call method here, pass results.
+    parseTLEFromAPI(f);
+  }
+  
 });
 
-//Call method here, pass results.
-//parseTLEFromAPI(results);
+
