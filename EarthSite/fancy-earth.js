@@ -10,7 +10,7 @@ import {
 import { MAX_REACHABLE_DIST, calcLogLatDist } from "./js/ReponseParser.js";
 // Scene, Camera, Renderer
 
-const TLE_DATA_DATE = new Date();
+const TLE_DATA_DATE = new Date(2021,11,7).getTime();
 var width = window.innerWidth,
   height = window.innerHeight,
   radius = 228,
@@ -18,7 +18,7 @@ var width = window.innerWidth,
     graticule10(),
     new THREE.LineBasicMaterial({ color: 0xaaaaaa })
   ),
-  activeClock = clock().rate(1000).date(new Date(TLE_DATA_DATE.getTime()));
+  activeClock = clock().rate(1000).date(TLE_DATA_DATE);
 let renderer = new THREE.WebGLRenderer();
 let scene = new THREE.Scene();
 let aspect = window.innerWidth / window.innerHeight;
@@ -230,11 +230,11 @@ var satrecs;
 var satellites;
 //Parameter is a double array with tle1,tle2,id and name
 export function parseTLEFromAPI(parsedData) {
-  var activeClock = clock().rate(1000).date(new Date(TLE_DATA_DATE.getTime()));
+  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
   var satGeometry = new THREE.Geometry();
   var date = new Date(activeClock.date());
   satrecs = tle(window.satellite)
-    .date(new Date(TLE_DATA_DATE.getTime()))
+    .date(TLE_DATA_DATE)
     .satrecs(parsedData);
   //Skip satellites with no position or veloctiy
   satrecs = satrecs.filter(
@@ -246,14 +246,16 @@ export function parseTLEFromAPI(parsedData) {
   });
   satellites = new THREE.Points(
     satGeometry,
-    new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
+    new THREE.PointsMaterial({ color: 0xFF0096, size: 20 })
   );
   scene.add(satellites);
 }
 
 d3.timer(animate);
 
+
 function animate(t) {
+  //console.log(satellites.geometry.vertices[0]);
   var date = new Date(activeClock.elapsed(t).date());
   for (let i = 0; i < satrecs.length; i++) {
     satellites.geometry.vertices[i] = satelliteVector(satrecs[i], date);
@@ -283,32 +285,6 @@ orbitControls.addEventListener("change", () => {
 });
 scene.add(camera);
 scene.add(spotLight);
-
-
-
-var parsedTles;
-var satellites;
-//Parameter is a double array with tle1,tle2,id and name
-export function parseTLEFromAPI(parsedData){
-  var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
-  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
-  var satGeometry = new THREE.Geometry();
-  var date = new Date(activeClock.date());
-  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
-  //Skip satellites with no position or veloctiy
-  satrecs = satrecs.filter(satrecs => satellite.propagate(satrecs, date)[0] != false);
-  //-------
-  satGeometry.vertices = satrecs.map(function (satrec) {
-    return satelliteVector(satrec, date);
-  });
-  //Satellites 
-  satellites = new THREE.Points(
-    satGeometry,
-    new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
-  );
-  scene.add(satellites);
-  console.log(satellites);
-}
 
 //Orbits all satellites around the globe
 //https://threejs.org/docs/#api/en/core/Object3D.rotation
@@ -355,7 +331,7 @@ var setting = {
 
       var sats = satrecs.map((s) => {
         //  console.log("s :>> ", s);
-        return satrecToXYZ(s, new Date(TLE_DATA_DATE.getTime()));
+        return satrecToXYZ(s, TLE_DATA_DATE);
       });
       //console.log("sats :>> ", sats);
       const {
