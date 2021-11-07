@@ -1,6 +1,5 @@
 import { clock, tle, satelliteVector } from "./js/helper.js";
-import { assetLoader } from "./js/assetLoader.js";
-import { calcLogLatDist } from "../ReponseParser.js";
+import { MAX_REACHABLE_DIST, calcLogLatDist } from "./js/ReponseParser.js";
 // Scene, Camera, Renderer
 
 var width = window.innerWidth,
@@ -235,7 +234,7 @@ export function parseTLEFromAPI(parsedData) {
   );
   scene.add(satellites);
 }
-scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
+// scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
 // Scene, Camera, Renderer Configuration
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(width, height);
@@ -273,17 +272,17 @@ window.addEventListener("resize", function () {
 });
 //GUI
 var setting = {
-  Coverage: function()  { 
+  Coverage: function () {
     // window.location = "geolocation.html";
     var message = document.getElementById("demo");
     // console.log(this.range);
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-      } else {
-        message.innerHTML = "Geolocation is not supported by this browser.";
-      }
-    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      message.innerHTML = "Geolocation is not supported by this browser.";
+    }
+
     function showPosition(position) {
       const satDat = calcLogLatDist(
         [position.coords.longitude, position.coords.latitude],
@@ -292,17 +291,19 @@ var setting = {
           [92.57, -43.74],
         ]
       );
-
-      message.innerHTML =
-        "hasCoverage: " + MAX_REACHABLE_DIST >= satDat.smallestDistance;
+      console.log(
+        "MAX_REACHABLE_DIST >= satDat.smallestDistance :>> ",
+        MAX_REACHABLE_DIST >= satDat.smallestDistance
+      );
+      $("#demo p").text(MAX_REACHABLE_DIST >= satDat.smallestDistance);
+      // message.innerHTML =
+      //   "hasCoverage: " + (MAX_REACHABLE_DIST >= satDat.smallestDistance);
     }
-}
-
+  },
 };
 var gui = new dat.GUI();
-gui.add(setting, 'Coverage');
+gui.add(setting, "Coverage");
 gui.open();
-
 
 // Main render function
 let render = function () {

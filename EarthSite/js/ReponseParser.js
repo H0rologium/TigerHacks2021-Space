@@ -6,12 +6,12 @@ export function calcLogLatDist([log, lat], satellites) {
   // console.log("User Latitude:" + w);
   // console.log("User Longitude:" + x);
   var latdistance1 = lat * 111;
-  var logdistance1 = log * (Math.cos((w * Math.PI) / 180) * 111);
+  var logdistance1 = log * (Math.cos((lat * Math.PI) / 180) * 111);
 
   // const satellites = [[36.04, -79.78], [92.57, -43.74]];
 
-  smallestDistance = 99999999999;
-  smallestIndex = 0;
+  var smallestDistance = 99999999999;
+  var smallestIndex = 0;
 
   function satBalls(satellites) {
     for (let i = 0; i < satellites.length; i++) {
