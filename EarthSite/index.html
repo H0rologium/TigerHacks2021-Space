@@ -39,6 +39,15 @@
       font-size: 2em;
       padding: 0;
       margin: 1rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: white;
+    }
+
+    h1 label {
+      font-style: italic;
+      font-weight: 300;
     }
 
     p {
@@ -123,7 +132,7 @@
       color: white;
       padding: 0;
       margin: 0;
-      font-size: 1rem;
+      font-size: 2rem;
     }
 
     #checkCoverage {
@@ -131,14 +140,6 @@
       right: 0;
       top: 0;
       margin: 1rem;
-    }
-
-    h1 {
-      position: absolute;
-      top: 0;
-      left: 0;
-      color: white;
-
     }
   </style>
   <script src="../node_modules/jquery/dist/jquery.js"></script>
@@ -155,7 +156,7 @@
   <button id="checkCoverage" data-hover="Let's Go!">
     <div>Check Coverage!</div>
   </button>
-  <h1>FSM: Fancy Planet Simulator</h1>
+  <h1>FSM: <label>Fancy Planet Simulator</label></h1>
   <div id="demo">
     <p id="coverageMessage"></p><br />
     <p id="closestSatellite"></p>
