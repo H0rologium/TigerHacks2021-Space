@@ -1,3 +1,5 @@
+export const MAX_REACHABLE_DIST = 750;
+
 export function calcLogLatDist([log, lat], satellites) {
   // var w = prompt("What is your latitude? We promise not to track you.");
   // var x = prompt("What is your longitude? (I pinky promise, don't worry ;) )");

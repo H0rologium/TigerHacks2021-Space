@@ -1,5 +1,6 @@
 import { clock, tle, satelliteVector } from "./js/helper.js";
 import { assetLoader } from "./js/assetLoader.js";
+import { calcLogLatDist } from "../ReponseParser.js";
 // Scene, Camera, Renderer
 
 var width = window.innerWidth,
