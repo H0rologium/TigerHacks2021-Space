@@ -243,7 +243,7 @@ export function parseTLEFromAPI(parsedData) {
   });
   satellites = new THREE.Points(
     satGeometry,
-    new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
+    new THREE.PointsMaterial({ color: 0xFF0096, size: 20 })
   );
   scene.add(satellites);
 }
