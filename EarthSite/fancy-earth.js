@@ -1,3 +1,4 @@
+
 import {
   clock,
   tle,
@@ -278,9 +279,49 @@ orbitControls.addEventListener("change", () => {
       camera.position.z
     )
   );
+  
 });
 scene.add(camera);
 scene.add(spotLight);
+
+
+
+var parsedTles;
+var satellites;
+//Parameter is a double array with tle1,tle2,id and name
+export function parseTLEFromAPI(parsedData){
+  var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
+  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
+  var satGeometry = new THREE.Geometry();
+  var date = new Date(activeClock.date());
+  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
+  //Skip satellites with no position or veloctiy
+  satrecs = satrecs.filter(satrecs => satellite.propagate(satrecs, date)[0] != false);
+  //-------
+  satGeometry.vertices = satrecs.map(function (satrec) {
+    return satelliteVector(satrec, date);
+  });
+  //Satellites 
+  satellites = new THREE.Points(
+    satGeometry,
+    new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
+  );
+  scene.add(satellites);
+  console.log(satellites);
+}
+
+//Orbits all satellites around the globe
+//https://threejs.org/docs/#api/en/core/Object3D.rotation
+var orbit = function()
+{
+   for (let x in satellites)
+   {
+    //console.log(x);
+   }
+   
+};
+
+
 
 scene.add(earth);
 // Light Configurations
@@ -311,6 +352,7 @@ var setting = {
     }
 
     function showPosition(position) {
+
       var sats = satrecs.map((s) => {
         //  console.log("s :>> ", s);
         return satrecToXYZ(s, new Date(TLE_DATA_DATE.getTime()));
@@ -344,6 +386,7 @@ var setting = {
 $("#checkCoverage").on("click", function () {
   setting.Coverage();
 });
+
 // Main render function
 let render = function () {
   earth.getObjectByName("surface").rotation.y += (1 / 32) * 0.01;
@@ -354,9 +397,12 @@ let render = function () {
     camera.position.x = 2 * Math.sin(cameraRotation);
     camera.position.z = 2 * Math.cos(cameraRotation);
     camera.lookAt(earth.position);
+    
   }
+  
   requestAnimationFrame(render);
   renderer.render(scene, camera);
+  orbit();
 };
 
 render();
