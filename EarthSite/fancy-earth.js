@@ -13,6 +13,7 @@ const TLE_DATA_DATE = new Date(2021, 11, 7).getTime();
 var width = window.innerWidth,
   height = window.innerHeight,
   radius = 228,
+  doAnimate = true,
   graticule = wireframe(
     graticule10(),
     new THREE.LineBasicMaterial({ color: 0xaaaaaa })
@@ -243,7 +244,7 @@ export function parseTLEFromAPI(parsedData) {
   });
   satellites = new THREE.Points(
     satGeometry,
-    new THREE.PointsMaterial({ color: 0xFF0096, size: 20 })
+    new THREE.PointsMaterial({ color: 0xff0096, size: 20 })
   );
   scene.add(satellites);
 }
@@ -251,13 +252,15 @@ export function parseTLEFromAPI(parsedData) {
 d3.timer(animate);
 
 function animate(t) {
-  var date = new Date(activeClock.elapsed(t).date());
-  for (let i = 0; i < satrecs.length; i++) {
-    satellites.geometry.vertices[i] = satelliteVector(satrecs[i], date);
+  if (doAnimate) {
+    var date = new Date(activeClock.elapsed(t).date());
+    for (let i = 0; i < satrecs.length; i++) {
+      satellites.geometry.vertices[i] = satelliteVector(satrecs[i], date);
+    }
+    satellites.geometry.verticesNeedUpdate = true;
+    controls.update();
+    renderer.render(scene, camera);
   }
-  satellites.geometry.verticesNeedUpdate = true;
-  controls.update();
-  renderer.render(scene, camera);
 }
 // scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
 // Scene, Camera, Renderer Configuration
@@ -341,6 +344,9 @@ var setting = {
 // gui.open();
 $("#checkCoverage").on("click", function () {
   setting.Coverage();
+});
+$("#button-11").on("click", function () {
+  doAnimate = !doAnimate;
 });
 // Main render function
 let render = function () {
