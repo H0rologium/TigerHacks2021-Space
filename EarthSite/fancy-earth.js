@@ -1,5 +1,7 @@
 import { clock, tle, satelliteVector } from "./js/helper.js";
 import { assetLoader } from "./js/assetLoader.js";
+
+import { MAX_REACHABLE_DIST, calcLogLatDist } from "../ReponseParser.js";
 // Scene, Camera, Renderer
 
 var width = window.innerWidth,
@@ -272,28 +274,29 @@ window.addEventListener("resize", function () {
 });
 //GUI
 var setting = {
-  Coverage: function()  { 
+  Coverage: function () {
     // window.location = "geolocation.html";
     var message = document.getElementById("demo");
     // console.log(this.range);
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-      } else {
-        message.innerHTML = "Geolocation is not supported by this browser.";
-      }
-    
-    function showPosition(position) {
-      message.innerHTML = "Latitude: " + position.coords.latitude + 
-      "<br>Longitude: " + position.coords.longitude;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      message.innerHTML = "Geolocation is not supported by this browser.";
     }
-}
 
+    function showPosition(position) {
+      message.innerHTML =
+        "Latitude: " +
+        position.coords.latitude +
+        "<br>Longitude: " +
+        position.coords.longitude;
+    }
+  },
 };
 var gui = new dat.GUI();
-gui.add(setting, 'Coverage');
+gui.add(setting, "Coverage");
 gui.open();
-
 
 // Main render function
 let render = function () {
