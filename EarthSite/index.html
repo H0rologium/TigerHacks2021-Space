@@ -12,16 +12,34 @@
       display: block;
     }
   </style>
+  <script src="../node_modules/jquery/dist/jquery.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/3.0.0/satellite.min.js"></script>
   <script src="./js/OrbitalControls.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js"></script>
+  <script type='text/javascript' src='DAT.GUI.min.js'></script>
+
+
+
+
 
 </head>
 
 <body>
+  <p id="demo"></p>
+  <style>
+    body{
+    background-color:black;
+    }
+    p{
+    color:white;
+    text-align: right;
+    padding-top: 4.5%;
+    }
+  </style>
   <script src="fancy-earth.js" type="module"></script>
+  <script src="apiClient.js" type="module"></script>
 </body>
 
 </html>

@@ -1,4 +1,5 @@
-import { clock, tle, parseTle, satelliteVector } from "./js/helper.js";
+import { clock, tle, satelliteVector } from "./js/helper.js";
+import { assetLoader } from "./js/assetLoader.js";
 // Scene, Camera, Renderer
 
 var width = window.innerWidth,
@@ -211,6 +212,29 @@ textureLoader.load(
   }
 );
 
+var satellites;
+//Parameter is a double array with tle1,tle2,id and name
+export function parseTLEFromAPI(parsedData) {
+  var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
+  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
+  var satGeometry = new THREE.Geometry();
+  var date = new Date(activeClock.date());
+  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
+  //Skip satellites with no position or veloctiy
+  satrecs = satrecs.filter(
+    (satrecs) => satellite.propagate(satrecs, date)[0] != false
+  );
+  //-------
+  satGeometry.vertices = satrecs.map(function (satrec) {
+    return satelliteVector(satrec, date);
+  });
+  satellites = new THREE.Points(
+    satGeometry,
+    new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
+  );
+  scene.add(satellites);
+}
+scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
 // Scene, Camera, Renderer Configuration
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(width, height);
@@ -230,26 +254,8 @@ orbitControls.addEventListener("change", () => {
 });
 scene.add(camera);
 scene.add(spotLight);
-scene.add(earth);
 
-var parsedTles;
-var satellites;
-//Parameter is a double array with tle1,tle2,id and name
-parseTLE(parsedData){
-  var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
-  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
-  var satGeometry = new THREE.Geometry();
-  var date = new Date(activeClock.date());
-  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
-  satGeometry.vertices = satrecs.map(function (satrec) {
-    return satelliteVector(satrec, date);
-  });
-  satellites = new THREE.Points(
-    satGeometry,
-    new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
-  );
-  scene.add(satellites);
-}
+scene.add(earth);
 // Light Configurations
 spotLight.position.set(600, 400, 1000);
 
@@ -264,6 +270,30 @@ window.addEventListener("resize", function () {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+//GUI
+var setting = {
+  Coverage: function()  { 
+    // window.location = "geolocation.html";
+    var message = document.getElementById("demo");
+    // console.log(this.range);
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        message.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    
+    function showPosition(position) {
+      message.innerHTML = "Latitude: " + position.coords.latitude + 
+      "<br>Longitude: " + position.coords.longitude;
+    }
+}
+
+};
+var gui = new dat.GUI();
+gui.add(setting, 'Coverage');
+gui.open();
+
 
 // Main render function
 let render = function () {
@@ -281,6 +311,3 @@ let render = function () {
 };
 
 render();
-
-
-
