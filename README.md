@@ -1,6 +1,7 @@
 # TigerHacks2021-Space
 A satellite imaging program
-##Running the program
+
+## Running the program
 This website should be able to run on any server. 
 It was tested using [vs code](https://code.visualstudio.com/) and the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension 
 
