@@ -227,10 +227,14 @@ orbitControls.addEventListener("change", () => {
       camera.position.z
     )
   );
+  
 });
 scene.add(camera);
 scene.add(spotLight);
 scene.add(earth);
+
+
+
 
 var parsedTles;
 var satellites;
@@ -247,12 +251,28 @@ export function parseTLEFromAPI(parsedData){
   satGeometry.vertices = satrecs.map(function (satrec) {
     return satelliteVector(satrec, date);
   });
+  //Satellites 
   satellites = new THREE.Points(
     satGeometry,
     new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
   );
   scene.add(satellites);
+  console.log(satellites);
 }
+
+//Orbits all satellites around the globe
+//https://threejs.org/docs/#api/en/core/Object3D.rotation
+var orbit = function()
+{
+   for (let x in satellites)
+   {
+    //console.log(x);
+   }
+   
+};
+
+
+
 // Light Configurations
 spotLight.position.set(600, 400, 1000);
 
@@ -278,9 +298,12 @@ let render = function () {
     camera.position.x = 2 * Math.sin(cameraRotation);
     camera.position.z = 2 * Math.cos(cameraRotation);
     camera.lookAt(earth.position);
+    
   }
+  
   requestAnimationFrame(render);
   renderer.render(scene, camera);
+  orbit();
 };
 
 render();

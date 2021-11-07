@@ -88,7 +88,8 @@ const results = [];
 var satellite = $.ajax({
   url: "https://tle.ivanstanojevic.me/api/tle/",
   data: { 
-    "search": "STARLINK"
+    "search": "STARLINK",
+    "page-size" : 100
   },
   method: "GET",
   success: function (response) {
@@ -96,7 +97,6 @@ var satellite = $.ajax({
     //results.push([response.line1, response.line2, ids[x], response.name]);
     const f = response.member.map(sat => [sat.line1, sat.line2]);
     //Call method here, pass results.
-    console.log(response)
     parseTLEFromAPI(f);
   }
   
