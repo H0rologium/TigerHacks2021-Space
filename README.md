@@ -1,5 +1,11 @@
 # TigerHacks2021-Space
 A satellite imaging program
+##Running the program
+This website should be able to run on any server. 
+It was tested using vs code and the Live Server extension 
+
+the entry point for the site is the earthsite/index.html
+Directories other than earthsite were used for new feature testing
 
 Reference websites:
 <br>
