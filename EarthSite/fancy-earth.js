@@ -1,12 +1,24 @@
-import { clock, tle, satelliteVector } from "./js/helper.js";
-import { assetLoader } from "./js/assetLoader.js";
 
-import { MAX_REACHABLE_DIST, calcLogLatDist } from "../ReponseParser.js";
+import {
+  clock,
+  tle,
+  satelliteVector,
+  satrecToXYZ,
+  graticule10,
+  wireframe,
+} from "./js/helper.js";
+import { MAX_REACHABLE_DIST, calcLogLatDist } from "./js/ReponseParser.js";
 // Scene, Camera, Renderer
 
+const TLE_DATA_DATE = new Date();
 var width = window.innerWidth,
   height = window.innerHeight,
-  radius = 228;
+  radius = 228,
+  graticule = wireframe(
+    graticule10(),
+    new THREE.LineBasicMaterial({ color: 0xaaaaaa })
+  ),
+  activeClock = clock().rate(1000).date(new Date(TLE_DATA_DATE.getTime()));
 let renderer = new THREE.WebGLRenderer();
 let scene = new THREE.Scene();
 let aspect = window.innerWidth / window.innerHeight;
@@ -213,15 +225,17 @@ textureLoader.load(
     scene.add(galaxy);
   }
 );
+var satrecs;
 
 var satellites;
 //Parameter is a double array with tle1,tle2,id and name
 export function parseTLEFromAPI(parsedData) {
-  var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
-  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
+  var activeClock = clock().rate(1000).date(new Date(TLE_DATA_DATE.getTime()));
   var satGeometry = new THREE.Geometry();
   var date = new Date(activeClock.date());
-  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
+  satrecs = tle(window.satellite)
+    .date(new Date(TLE_DATA_DATE.getTime()))
+    .satrecs(parsedData);
   //Skip satellites with no position or veloctiy
   satrecs = satrecs.filter(
     (satrecs) => satellite.propagate(satrecs, date)[0] != false
@@ -236,7 +250,19 @@ export function parseTLEFromAPI(parsedData) {
   );
   scene.add(satellites);
 }
-scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
+
+d3.timer(animate);
+
+function animate(t) {
+  var date = new Date(activeClock.elapsed(t).date());
+  for (let i = 0; i < satrecs.length; i++) {
+    satellites.geometry.vertices[i] = satelliteVector(satrecs[i], date);
+  }
+  satellites.geometry.verticesNeedUpdate = true;
+  orbitControls.update();
+  renderer.render(scene, camera);
+}
+// scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
 // Scene, Camera, Renderer Configuration
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(width, height);
@@ -326,17 +352,40 @@ var setting = {
     }
 
     function showPosition(position) {
-      message.innerHTML =
-        "Latitude: " +
-        position.coords.latitude +
-        "<br>Longitude: " +
-        position.coords.longitude;
+
+      var sats = satrecs.map((s) => {
+        //  console.log("s :>> ", s);
+        return satrecToXYZ(s, new Date(TLE_DATA_DATE.getTime()));
+      });
+      //console.log("sats :>> ", sats);
+      const {
+        smallestDistance,
+        satellitePosition: [log, lat],
+      } = calcLogLatDist(
+        [position.coords.longitude, position.coords.latitude],
+        sats
+      );
+      // console.log(
+      //   "MAX_REACHABLE_DIST >= smallestDistance :>> ",
+      //   MAX_REACHABLE_DIST >= smallestDistance
+      // );
+      $("#coverageMessage").text(
+        MAX_REACHABLE_DIST >= smallestDistance
+          ? "You have Coverage!"
+          : "Sorry! you don't have coverage. :("
+      );
+      $("#closestSatellite").text("Closest satellite: " + log + ", " + lat);
+      // message.innerHTML =
+      //   "hasCoverage: " + (MAX_REACHABLE_DIST >= satDat.smallestDistance);
     }
   },
 };
-var gui = new dat.GUI();
-gui.add(setting, "Coverage");
-gui.open();
+// var gui = new dat.GUI();
+// gui.add(setting, "Coverage");
+// gui.open();
+$("#checkCoverage").on("click", function () {
+  setting.Coverage();
+});
 
 // Main render function
 let render = function () {
