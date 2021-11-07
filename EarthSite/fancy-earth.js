@@ -1,10 +1,23 @@
-import { clock, tle, satelliteVector, satrecToXYZ } from "./js/helper.js";
+import {
+  clock,
+  tle,
+  satelliteVector,
+  satrecToXYZ,
+  graticule10,
+  wireframe,
+} from "./js/helper.js";
 import { MAX_REACHABLE_DIST, calcLogLatDist } from "./js/ReponseParser.js";
 // Scene, Camera, Renderer
 
+const TLE_DATA_DATE = new Date();
 var width = window.innerWidth,
   height = window.innerHeight,
-  radius = 228;
+  radius = 228,
+  graticule = wireframe(
+    graticule10(),
+    new THREE.LineBasicMaterial({ color: 0xaaaaaa })
+  ),
+  activeClock = clock().rate(1000).date(new Date(TLE_DATA_DATE.getTime()));
 let renderer = new THREE.WebGLRenderer();
 let scene = new THREE.Scene();
 let aspect = window.innerWidth / window.innerHeight;
@@ -212,7 +225,7 @@ textureLoader.load(
   }
 );
 var satrecs;
-const TLE_DATA_DATE = new Date();
+
 var satellites;
 //Parameter is a double array with tle1,tle2,id and name
 export function parseTLEFromAPI(parsedData) {
@@ -235,6 +248,18 @@ export function parseTLEFromAPI(parsedData) {
     new THREE.PointsMaterial({ color: 0x0096ff, size: 20 })
   );
   scene.add(satellites);
+}
+
+d3.timer(animate);
+
+function animate(t) {
+  var date = new Date(activeClock.elapsed(t).date());
+  for (let i = 0; i < satrecs.length; i++) {
+    satellites.geometry.vertices[i] = satelliteVector(satrecs[i], date);
+  }
+  satellites.geometry.verticesNeedUpdate = true;
+  orbitControls.update();
+  renderer.render(scene, camera);
 }
 // scene.add(assetLoader(renderer, "./assets", "Aqua_13.glb"));
 // Scene, Camera, Renderer Configuration
@@ -287,10 +312,10 @@ var setting = {
 
     function showPosition(position) {
       var sats = satrecs.map((s) => {
-      //  console.log("s :>> ", s);
+        //  console.log("s :>> ", s);
         return satrecToXYZ(s, new Date(TLE_DATA_DATE.getTime()));
       });
-//console.log("sats :>> ", sats);
+      //console.log("sats :>> ", sats);
       const {
         smallestDistance,
         satellitePosition: [log, lat],
@@ -302,23 +327,23 @@ var setting = {
       //   "MAX_REACHABLE_DIST >= smallestDistance :>> ",
       //   MAX_REACHABLE_DIST >= smallestDistance
       // );
-      $("#demo p").text(
-        "has Coverage: " +
-          (MAX_REACHABLE_DIST >= smallestDistance) +
-          "\n closest satellite: " +
-          log +
-          ", " +
-          lat
+      $("#coverageMessage").text(
+        MAX_REACHABLE_DIST >= smallestDistance
+          ? "You have Coverage!"
+          : "Sorry! you don't have coverage. :("
       );
+      $("#closestSatellite").text("Closest satellite: " + log + ", " + lat);
       // message.innerHTML =
       //   "hasCoverage: " + (MAX_REACHABLE_DIST >= satDat.smallestDistance);
     }
   },
 };
-var gui = new dat.GUI();
-gui.add(setting, "Coverage");
-gui.open();
-
+// var gui = new dat.GUI();
+// gui.add(setting, "Coverage");
+// gui.open();
+$("#checkCoverage").on("click", function () {
+  setting.Coverage();
+});
 // Main render function
 let render = function () {
   earth.getObjectByName("surface").rotation.y += (1 / 32) * 0.01;

@@ -61,14 +61,22 @@ export function satrecToFeature(satrec, date, props) {
 }
 
 export function satrecToXYZ(satrec, date) {
- // console.log("date :>> ", date);
- // console.log("satrecXYA data :>> ", satrec);
+  // console.log("date :>> ", date);
+  // console.log("satrecXYA data :>> ", satrec);
   var positionAndVelocity = satellite.propagate(satrec, date);
   var gmst = satellite.gstime(date);
   var positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
   return [positionGd.longitude, positionGd.latitude, positionGd.height];
 }
-
+export function wireframe(multilinestring, material) {
+  var geometry = new THREE.Geometry();
+  multilinestring.coordinates.forEach(function (line) {
+    d3.pairs(line.map(vertex), function (a, b) {
+      geometry.vertices.push(a, b);
+    });
+  });
+  return new THREE.LineSegments(geometry, material);
+}
 /* ==================================================== */
 /* =============== TLE ================================ */
 /* ==================================================== */
@@ -155,6 +163,7 @@ export function satelliteVector(satrec, date) {
 }
 
 export function vertex(point) {
+  const radius = 228;
   var lambda = (point[0] * Math.PI) / 180,
     phi = (point[1] * Math.PI) / 180,
     cosPhi = Math.cos(phi);
