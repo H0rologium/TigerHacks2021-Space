@@ -1,4 +1,4 @@
-import { clock, tle, satelliteVector } from "./js/helper.js";
+import { clock, tle, satelliteVector, satrecToXYZ } from "./js/helper.js";
 import { MAX_REACHABLE_DIST, calcLogLatDist } from "./js/ReponseParser.js";
 // Scene, Camera, Renderer
 
@@ -211,15 +211,17 @@ textureLoader.load(
     scene.add(galaxy);
   }
 );
-
+var satrecs;
+const TLE_DATA_DATE = new Date();
 var satellites;
 //Parameter is a double array with tle1,tle2,id and name
 export function parseTLEFromAPI(parsedData) {
-  var TLE_DATA_DATE = new Date(2018, 0, 26).getTime();
-  var activeClock = clock().rate(1000).date(TLE_DATA_DATE);
+  var activeClock = clock().rate(1000).date(new Date(TLE_DATA_DATE.getTime()));
   var satGeometry = new THREE.Geometry();
   var date = new Date(activeClock.date());
-  var satrecs = tle(window.satellite).date(TLE_DATA_DATE).satrecs(parsedData);
+  satrecs = tle(window.satellite)
+    .date(new Date(TLE_DATA_DATE.getTime()))
+    .satrecs(parsedData);
   //Skip satellites with no position or veloctiy
   satrecs = satrecs.filter(
     (satrecs) => satellite.propagate(satrecs, date)[0] != false
@@ -284,18 +286,30 @@ var setting = {
     }
 
     function showPosition(position) {
-      const satDat = calcLogLatDist(
+      var sats = satrecs.map((s) => {
+      //  console.log("s :>> ", s);
+        return satrecToXYZ(s, new Date(TLE_DATA_DATE.getTime()));
+      });
+//console.log("sats :>> ", sats);
+      const {
+        smallestDistance,
+        satellitePosition: [log, lat],
+      } = calcLogLatDist(
         [position.coords.longitude, position.coords.latitude],
-        [
-          [36.04, -79.78],
-          [92.57, -43.74],
-        ]
+        sats
       );
-      console.log(
-        "MAX_REACHABLE_DIST >= satDat.smallestDistance :>> ",
-        MAX_REACHABLE_DIST >= satDat.smallestDistance
+      // console.log(
+      //   "MAX_REACHABLE_DIST >= smallestDistance :>> ",
+      //   MAX_REACHABLE_DIST >= smallestDistance
+      // );
+      $("#demo p").text(
+        "has Coverage: " +
+          (MAX_REACHABLE_DIST >= smallestDistance) +
+          "\n closest satellite: " +
+          log +
+          ", " +
+          lat
       );
-      $("#demo p").text(MAX_REACHABLE_DIST >= satDat.smallestDistance);
       // message.innerHTML =
       //   "hasCoverage: " + (MAX_REACHABLE_DIST >= satDat.smallestDistance);
     }

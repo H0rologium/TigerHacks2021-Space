@@ -5,6 +5,7 @@ export function calcLogLatDist([log, lat], satellites) {
   // var x = prompt("What is your longitude? (I pinky promise, don't worry ;) )");
   // console.log("User Latitude:" + w);
   // console.log("User Longitude:" + x);
+  console.log("satellites :>> ", satellites);
   var latdistance1 = lat * 111;
   var logdistance1 = log * (Math.cos((lat * Math.PI) / 180) * 111);
 
