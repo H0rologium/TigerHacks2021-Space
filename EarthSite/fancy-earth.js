@@ -1,4 +1,5 @@
 import { clock, tle, parseTle, satelliteVector } from "./js/helper.js";
+// import * as dat from 'dat.gui';
 // Scene, Camera, Renderer
 
 var width = window.innerWidth,
@@ -267,6 +268,30 @@ window.addEventListener("resize", function () {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+//GUI
+var setting = {
+  Coverage: function()  { 
+    // window.location = "geolocation.html";
+    var message = document.getElementById("demo");
+    // console.log(this.range);
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        message.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    
+    function showPosition(position) {
+      message.innerHTML = "Latitude: " + position.coords.latitude + 
+      "<br>Longitude: " + position.coords.longitude;
+    }
+}
+
+};
+var gui = new dat.GUI();
+gui.add(setting, 'Coverage');
+gui.open();
+
 
 // Main render function
 let render = function () {
