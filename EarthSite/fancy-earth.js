@@ -285,8 +285,16 @@ var setting = {
       }
     
     function showPosition(position) {
-      message.innerHTML = "Latitude: " + position.coords.latitude + 
-      "<br>Longitude: " + position.coords.longitude;
+      const satDat = calcLogLatDist(
+        [position.coords.longitude, position.coords.latitude],
+        [
+          [36.04, -79.78],
+          [92.57, -43.74],
+        ]
+      );
+
+      message.innerHTML =
+        "hasCoverage: " + MAX_REACHABLE_DIST >= satDat.smallestDistance;
     }
 }
 
