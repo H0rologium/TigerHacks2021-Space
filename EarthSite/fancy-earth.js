@@ -345,7 +345,7 @@ var setting = {
 $("#checkCoverage").on("click", function () {
   setting.Coverage();
 });
-$("#button-11").on("click", function () {
+$("#check3").on("click", function () {
   doAnimate = !doAnimate;
 });
 // Main render function
